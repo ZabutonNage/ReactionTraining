@@ -12,6 +12,14 @@ body {
     flex-wrap: wrap;
     width: 100%;
     height: 100%;
+    position: relative;
+}
+
+#meta-stuff {
+    position: absolute;
+    z-index: 200;
+    top: 4px;
+    left: 4px;
 }
 
 .tapCardOuter {

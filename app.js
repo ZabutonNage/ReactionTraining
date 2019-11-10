@@ -7,7 +7,6 @@
     const flashDurationBase = 800;
     const flashVariation = .4 * flashDurationBase;
     const flashCount = 24;
-    let hits = 0;
 
     const $appendNode = targetNode => node => targetNode.appendChild(node);
     const $appendToApp = $appendNode(appNode);
@@ -26,46 +25,61 @@
     // TODO min/max intervals
     // TODO predefined sequences via code so user can repeat same sequence
 
-    $nextCard(flashCount);
+    doc.querySelector(`#btn-start`).addEventListener(`click`, ({ target }) => {
+        target.parentNode.removeChild(target);
+        appNode.requestFullscreen()
+            .then($nextCard(flashCount))
+            .then(hits => {
+                // TODO nicer presentation of result
+                const percentage = (hits / flashCount * 100).toFixed(1);
+                alert(`Done! Hit count: ${hits} out of ${flashCount} (${percentage}%)`);
+                doc.exitFullscreen();
+            });
+    }, { once: true });
 
 
-    function $nextCard(i) {
-        if (i === 0) {
-            // TODO nicer presentation of result
-            const percentage = (hits / flashCount * 100).toFixed(1);
-            alert(`Done! Hit count: ${hits} out of ${flashCount} (${percentage}%)`);
-            return;
-        }
+    function $nextCard(remaining) {
+        return () => new Promise(resolve => {
+            let hits = 0;
+            _$nextCard(remaining);
 
-        const interval = intervalBase + $randInt(intervalVariation) - intervalVariation / 2;
 
-        setTimeout(() => {
-            const card = cards[$randInt(cards.length)];
-            card.$on();
+            function _$nextCard(remaining) {
+                if (remaining === 0) return resolve(hits);
 
-            new Promise(resolve => {
-                const flashDuration = flashDurationBase + $randInt(flashVariation) - flashVariation / 2;
-                const listener = () => resolve(`click`);
-                card.node.addEventListener(`click`, listener, { once: true });
+                const interval = intervalBase + $randInt(intervalVariation) - intervalVariation / 2;
 
                 setTimeout(() => {
-                    card.node.removeEventListener(`click`, listener);
-                    resolve(`timeout`);
-                }, flashDuration);
+                    const card = cards[$randInt(cards.length)];
+                    card.$on();
 
-            }).then(result => {
-                if (result === `click`) {
-                    hits++;
-                }
-                // else if (result === `timeout`) {
-                // }
+                    new Promise(resolve => {
+                        const flashDuration = flashDurationBase + $randInt(flashVariation) - flashVariation / 2;
+                        const listener = () => {
+                            resolve(`mousedown`);
+                        };
+                        card.node.addEventListener(`mousedown`, listener, { once: true });
 
-                $separateFrames([
-                    () => card.$off(),
-                    () => $nextCard(i -1)
-                ]);
-            });
-        }, interval);
+                        setTimeout(() => {
+                            card.node.removeEventListener(`mousedown`, listener);
+                            resolve(`timeout`);
+                        }, flashDuration);
+
+                    }).then(result => {
+                        if (result === `mousedown`) {
+                            hits++;
+                        }
+                        // else if (result === `timeout`) {
+                        // }
+
+                        $separateFrames([
+                            () => card.$off(),
+                            () => _$nextCard(remaining -1)
+                        ]);
+                    });
+                }, interval);
+            }
+        });
     }
 
 
