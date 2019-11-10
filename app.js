@@ -4,7 +4,7 @@
     const displayedCardCount = 20;
     const intervalBase = 1000;
     const intervalVariation = .9 * intervalBase;
-    const flashDurationBase = 800;
+    const flashDurationBase = 1000;
     const flashVariation = .4 * flashDurationBase;
     const flashCount = 24;
 
