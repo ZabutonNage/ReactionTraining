@@ -1,5 +1,8 @@
 (function(doc) {
     const appNode = doc.querySelector(`#app`);
+    const msgNode = doc.querySelector(`#msg`);
+
+    msgNode.innerText = `1`;
 
     const displayedCardCount = 20;
     const intervalBase = 1000;
@@ -52,10 +55,12 @@
                 setTimeout(() => {
                     const card = cards[$randInt(cards.length)];
                     card.$on();
+                    msgNode.innerText = ``;
 
                     new Promise(resolve => {
                         const flashDuration = flashDurationBase + $randInt(flashVariation) - flashVariation / 2;
                         const listener = () => {
+                            msgNode.innerText = `mousedown`;
                             resolve(`mousedown`);
                         };
                         card.node.addEventListener(`mousedown`, listener, { once: true });
