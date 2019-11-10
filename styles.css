@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+}
+
+#app {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100vw;
+    height: 100vh;
+}
+
+.tapCardOuter {
+    box-sizing: border-box;
+    width: 20%;
+    height: 25%;
+    padding: 1rem;
+    flex-grow: 0;
+    flex-shrink: 0;
+}
+
+.tapCard {
+    height: 100%;
+    background-color: transparent;
+    border-radius: 4px;
+}
+
+.tapCard.active {
+    background-color: deepskyblue;
+}
